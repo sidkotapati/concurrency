@@ -1,0 +1,56 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "spinlock",
+    hdrs = ["spinlock/spinlock.h"],
+)
+
+cc_library(
+    name = "seqlock",
+    hdrs = ["seqlock/seqlock.h"],
+    deps = [":spinlock"],
+)
+
+cc_test(
+    name = "lock_test",
+    srcs = ["lock_test.cpp"],
+    copts = ["-std=c++23"],
+    deps = [
+        ":seqlock",
+        ":spinlock",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "lock_test_asan_ubsan",
+    srcs = ["lock_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=address,undefined"],
+    deps = [
+        ":seqlock",
+        ":spinlock",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "lock_test_tsan",
+    srcs = ["lock_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=thread",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=thread"],
+    deps = [
+        ":seqlock",
+        ":spinlock",
+        "@catch2//:catch2_main",
+    ],
+)
