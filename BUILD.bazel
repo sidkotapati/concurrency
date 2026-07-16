@@ -12,6 +12,11 @@ cc_library(
     deps = [":spinlock"],
 )
 
+cc_library(
+    name = "spsc",
+    hdrs = ["spsc/spsc.h"],
+)
+
 cc_test(
     name = "lock_test",
     srcs = ["lock_test.cpp"],
@@ -19,6 +24,46 @@ cc_test(
     deps = [
         ":seqlock",
         ":spinlock",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "spsc_test",
+    srcs = ["spsc/spsc_test.cpp"],
+    copts = ["-std=c++23"],
+    deps = [
+        ":spsc",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "spsc_test_asan_ubsan",
+    srcs = ["spsc/spsc_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=address,undefined"],
+    deps = [
+        ":spsc",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "spsc_test_tsan",
+    srcs = ["spsc/spsc_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=thread",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=thread"],
+    deps = [
+        ":spsc",
         "@catch2//:catch2_main",
     ],
 )
