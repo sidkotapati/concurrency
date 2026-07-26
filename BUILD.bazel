@@ -14,7 +14,12 @@ cc_library(
 
 cc_library(
     name = "spsc",
-    hdrs = ["spsc/spsc.h"],
+    hdrs = ["spsc/spsc_queue.h"],
+)
+
+cc_library(
+    name = "mpmc",
+    hdrs = ["mpmc/mpmc_queue.h"],
 )
 
 cc_test(
@@ -34,6 +39,46 @@ cc_test(
     copts = ["-std=c++23"],
     deps = [
         ":spsc",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "mpmc_test",
+    srcs = ["mpmc/mpmc_test.cpp"],
+    copts = ["-std=c++23"],
+    deps = [
+        ":mpmc",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "mpmc_test_asan_ubsan",
+    srcs = ["mpmc/mpmc_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=address,undefined"],
+    deps = [
+        ":mpmc",
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "mpmc_test_tsan",
+    srcs = ["mpmc/mpmc_test.cpp"],
+    copts = [
+        "-std=c++23",
+        "-fsanitize=thread",
+        "-fno-omit-frame-pointer",
+    ],
+    linkopts = ["-fsanitize=thread"],
+    deps = [
+        ":mpmc",
         "@catch2//:catch2_main",
     ],
 )

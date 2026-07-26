@@ -5,7 +5,7 @@
 #include <optional>
 #include <iostream>
 
-#include "spsc.h"
+#include "spsc_queue.h"
 
 TEST_CASE("spsc queue test") {
     // Queue of size 1 should produce the most EMPTY / FULL behavior
