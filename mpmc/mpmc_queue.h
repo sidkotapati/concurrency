@@ -28,7 +28,7 @@ public:
     [[nodiscard]] bool try_push(U&& element) {
         uint64_t head_pos{ head_.load(std::memory_order_relaxed) }; 
         const uint64_t seq_num_at_head{ data_[head_pos % SIZE].seq_num.load(std::memory_order_acquire) };
-        
+
         // Guards against enqueue between the loads and fullness
         if (head_pos != seq_num_at_head) return false; 
         const uint64_t next_head{ head_pos + 1 };
@@ -64,11 +64,11 @@ public:
 
 
 private:
-    std::atomic<uint64_t> head_{ 0ull };
-    std::atomic<uint64_t> tail_{ 0ull };
+    alignas(std::hardware_destructive_interference_size) std::atomic<uint64_t> head_{ 0ull };
+    alignas(std::hardware_destructive_interference_size) std::atomic<uint64_t> tail_{ 0ull };
     struct Slot {
         T value;
         std::atomic<uint64_t> seq_num;
     };
-    std::array<Slot, SIZE> data_;
+    alignas(std::hardware_destructive_interference_size) std::array<Slot, SIZE> data_;
 };
